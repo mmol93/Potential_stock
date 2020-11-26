@@ -61,9 +61,9 @@ try:
         for j in range(0, 6):
             five_change_rate = round((int(price_list[0]) - int(price_list[j])) / int(price_list[j]) * 100, 2)
             # 현재가 기준 최근 6일간 시세에서 몇 %이상 변동이 있었는지 판단한다
-            if five_change_rate >= 2.3:
+            if five_change_rate >= 1.8:
                 five_change_counter_plus += 1
-            elif five_change_rate <= -2.3:
+            elif five_change_rate <= -1.8:
                 five_change_counter_minus += 1
 
         # CCI 계산(10일치만 계산한다)
@@ -213,13 +213,13 @@ try:
         total = ""
         # 1. 이평선 위 + CCI(40이하) + 최근 급등 1번 or 급락 있음(1 => ) + 외국인이 구매 시작 = 매수 고려
         if present_diff_avgFive > 0 and CCI <= 40 and (five_change_counter_plus > 0 or five_change_counter_minus > 0) and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
-            total = "매수 고려1"
+            total = "올라 타기1"
         # 2. 이평선 아래 + CCI(40이하) + 급락 있음 = 주시하기 or 뉴스 확인
         elif present_diff_avgFive < 0 and five_change_counter_minus > 1:
             total = "뉴스 확인2"
         # 3. 이평선 위 + CCI(80 이상) + 최근 급등 2번 + 외국인 매수 = 매수 고려
         elif present_diff_avgFive > 0 and CCI >= 80 and five_change_counter_plus > 1 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
-            total = "매수 고려3"
+            total = "올라 타기3"
         # 4. 이평선 아래 + CCI(40이하) + 최근 급락 2번 + 외국인 매수 = 매수 고려
         elif present_diff_avgFive < 0 and CCI <= 40 and five_change_counter_minus > 1 and foreign_buyingHistory_value > 0 and forign_buyingHistory_unit == "+":
             total = "매수 고려4"
@@ -238,8 +238,8 @@ try:
         result_list.append(stock_list[i])   # 종목명
         result_list.append(price_list[0])   # 종목 시세
         result_list.append(str(round(present_diff_avgFive, 2)) + "%")  # 현재 시세와 5일 이동평균 차이(%)
-        result_list.append("+(" + str(five_change_counter_plus) + ")")    # 5일간 +2.3% 간적 있는지 카운터
-        result_list.append("-(" + str(five_change_counter_minus) + ")")   # 5일간 -2.3% 간적 있는지 카운터
+        result_list.append("+(" + str(five_change_counter_plus) + ")")    # 5일간 +1.8% 간적 있는지 카운터
+        result_list.append("-(" + str(five_change_counter_minus) + ")")   # 5일간 -1.8% 간적 있는지 카운터
         result_list.append("CCI: " + str(CCI)) # CCI
         result_list.append("MACD: " + str(MACD))    # MACD
         result_list.append(forign_buyingHistory_message)    # 외국인 연속수급
