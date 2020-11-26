@@ -7,9 +7,11 @@ import get_sotckCode
 import check_Excell
 import numpy
 
-print("종목명 / 현재가 / 이평5일과 차이 / 5일간 주가 변봐량 / CCI / MACD / 외국인 연속 / 기관 연속")
-
 ### 종목들 각종 계산 및 정보 스크래핑하기
+
+print("실시 날짜: " + str(datetime.now().strftime("%Y/%m/%d, %H:%M")))
+
+print("종목명 / 현재가 / 이평5일과 차이 / 5일간 주가 변봐량 / CCI / MACD / 외국인 연속 / 기관 연속")
 
 stock_list = check_Excell.call_excell_stock()
 stockCode_list = get_sotckCode.code_search()
