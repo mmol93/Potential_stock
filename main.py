@@ -128,7 +128,7 @@ try:
 
         avg_ten = avg_ten // 10
 
-        MACD = round((avg_five - avg_ten) / avg_ten, 2)
+        MACD = round((avg_five - avg_ten) / avg_ten * 100, 2)
 
         driver.switch_to.default_content()
 
@@ -226,7 +226,7 @@ try:
         elif present_diff_avgFive < 0 and CCI <= 40 and five_change_counter_minus > 1 and foreign_buyingHistory_value > 0 and forign_buyingHistory_unit == "+":
             total = "매수 고려4"
         # 5 CCI(40이하) + 외국인/기관 매수 = 매수 고려
-        elif CCI <= 40 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 0:
+        elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and MACD < 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "매수 고려5"
         # 6 CCI(40이하) + 최근 급락/급등 없음 + 외국인 매수 = 눌림목
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
