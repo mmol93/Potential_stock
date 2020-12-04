@@ -7,6 +7,8 @@ import get_sotckCode
 import check_Excell
 import numpy
 
+## 가능성 종목 검토 툴
+
 ### 종목들 각종 계산 및 정보 스크래핑하기
 
 print("실시 날짜: " + str(datetime.now().strftime("%Y/%m/%d, %H:%M")))
@@ -56,7 +58,7 @@ try:
         # 현재가와 5일 이동평균 얼마나 차이 나는지 계산(%) - C
         present_diff_avgFive = round((int(price_list[0]) - avg_five) / avg_five * 100, 2)
 
-        # 최근 5일간 변화가 3%를 넘은적이 있는지 확인한다
+        # 최근 5일간 변화가 1.8%를 넘은적이 있는지 확인한다
         five_change_counter_plus = 0
         five_change_counter_minus = 0
 
@@ -214,8 +216,8 @@ try:
         # 조건에 따른 결과 출력
         total = ""
         # 1. 이평선 위 + CCI(40이하) + 최근 급등 1번 or 급락 있음(1 => ) + 외국인이 구매 시작 = 매수 고려
-        if present_diff_avgFive > 0 and CCI <= 40 and (five_change_counter_plus > 0 or five_change_counter_minus > 0) and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
-            total = "올라 타기1"
+        if present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus > 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
+            total = "매수 고려1"
         # 2. 이평선 아래 + CCI(40이하) + 급락 있음 = 주시하기 or 뉴스 확인
         elif present_diff_avgFive < 0 and five_change_counter_minus > 1:
             total = "뉴스 확인2"
@@ -227,10 +229,13 @@ try:
             total = "매수 고려4"
         # 5 CCI(40이하) + 외국인/기관 매수 = 매수 고려
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and MACD < 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
-            total = "매수 고려5"
+            total = "MACD 매수 고려5"
         # 6 CCI(40이하) + 최근 급락/급등 없음 + 외국인 매수 = 눌림목
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "눌림목"
+        # 7 CCI(40이하) + 최근 5일간 급락/급등(+- 1.8%) 없음 + 외국인/기관 매수 1번 이상 = 매수고려
+        elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
+            total = "매수 고려7"
         # 직접 분석
         else:
             total = "X"
