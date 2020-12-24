@@ -63,7 +63,7 @@ try:
         five_change_counter_minus = 0
 
         for j in range(0, 6):
-            five_change_rate = round((int(price_list[0]) - int(price_list[j])) / int(price_list[j]) * 100, 2)
+            five_change_rate = round((int(price_list[j]) - int(price_list[j+1])) / int(price_list[j]) * 100, 2)
             # 현재가 기준 최근 6일간 시세에서 몇 %이상 변동이 있었는지 판단한다
             if five_change_rate >= 1.8:
                 five_change_counter_plus += 1
@@ -215,17 +215,20 @@ try:
 
         # 조건에 따른 결과 출력
         total = ""
+        # 0. 급등 0번 + 급락 0번 이상 + 외국인 3일 연속 구매 = 외국인 풀매수
+        if forign_buyingHistory_unit == "+" and foreign_buyingHistory_value == 3 and five_change_counter_plus == 0 and five_change_counter_minus >= 0:
+            total = "0순위 외국인 풀매수"
         # 1. 이평선 위 + CCI(40이하) + 최근 급등 1번 or 급락 있음(1 => ) + 외국인이 구매 시작 = 매수 고려
-        if present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus > 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
+        elif present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus > 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "매수 고려1"
-        # 2. 이평선 아래 + CCI(40이하) + 급락 있음 = 주시하기 or 뉴스 확인
+        # 2. 이평선 아래 + CCI(40이하) + 급락 2번 이상 = 주시하기 or 뉴스 확인
         elif present_diff_avgFive < 0 and five_change_counter_minus > 1:
             total = "뉴스 확인2"
         # 3. 이평선 위 + CCI(80 이상) + 최근 급등 2번 + 외국인 매수 = 매수 고려
         elif present_diff_avgFive > 0 and CCI >= 80 and five_change_counter_plus > 1 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "올라 타기3"
-        # 4. 이평선 아래 + CCI(40이하) + 최근 급락 2번 + 외국인 매수 = 매수 고려
-        elif present_diff_avgFive < 0 and CCI <= 40 and five_change_counter_minus > 1 and foreign_buyingHistory_value > 0 and forign_buyingHistory_unit == "+":
+        # 4. 이평선 아래 + CCI(40이하) + 최근 급락 1번 + 외국인 매수 2번 = 매수 고려
+        elif present_diff_avgFive < 0 and CCI <= 40 and five_change_counter_minus >= 1 and foreign_buyingHistory_value > 1 and forign_buyingHistory_unit == "+":
             total = "매수 고려4"
         # 5 CCI(40이하) + 외국인/기관 매수 = 매수 고려
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and MACD < 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
@@ -236,6 +239,15 @@ try:
         # 7 CCI(40이하) + 최근 5일간 급락/급등(+- 1.8%) 없음 + 외국인/기관 매수 1번 이상 = 매수고려
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "매수 고려7"
+        # 8 최근 변동 1번 이하 + 외국인 2일 연속 매수 + 기관 2일 연속매수 + 이동선위 = 매수고려
+        elif (five_change_counter_plus <= 1 or five_change_counter_minus <= 1) and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1 and present_diff_avgFive > 0:
+            total = "매수 고려8"
+        # 9 외국인 2일 연속 매수 + 기관 2일 연속 매수 = 외국인 기관 양매수
+        elif forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1:
+            total = "기관 외국인 이틀 양매수9"
+        # 10 6일동안 변동 +, - 한 개도 없음 = 차트보기
+        elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0:
+            total = "차트보기10"
         # 직접 분석
         else:
             total = "X"
