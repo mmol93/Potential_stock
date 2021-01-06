@@ -252,6 +252,14 @@ try:
         else:
             total = "X"
 
+        ### 박스권 설정
+        # 종목명 설정
+        if (stock_list[i] == "더존비즈온"):
+            # 현재 시세와 박스권 가격 비교
+            if (int(price_list[0]) <= 100000):
+                total = "박스권 최하단"
+
+
         # 출력할 데이터 설정
         result_list = []
         result_list.append(stock_list[i])   # 종목명
