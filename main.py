@@ -246,7 +246,7 @@ try:
         elif forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1:
             total = "기관 외국인 이틀 양매수9"
         # 10 6일동안 변동 +, - 한 개도 없음 = 차트보기
-        elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0:
+        elif five_change_counter_plus == 0 and five_change_counter_minus == 0:
             total = "6일간 큰변동 없음"
         # 직접 분석
         else:
