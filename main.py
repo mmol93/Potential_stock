@@ -6,6 +6,10 @@ import time
 import get_sotckCode
 import check_Excell
 import numpy
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 ## 가능성 종목 검토 툴
 
@@ -13,7 +17,7 @@ import numpy
 
 print("실시 날짜: " + str(datetime.now().strftime("%Y/%m/%d, %H:%M")))
 
-print("종목명 / 현재가 / 이평5일과 차이 / 5일간 주가 변봐량 / CCI / MACD / 외국인 연속 / 기관 연속")
+print("종목명 / 현재가 / 이평5일과 차이 / 5일간 주가 변봐량 / CCI / MACD / 외국인 연속 / 기관 연속 / PER / PBR")
 
 stock_list = check_Excell.call_excell_stock()
 stockCode_list = get_sotckCode.code_search()
@@ -258,11 +262,26 @@ try:
             # 현재 시세와 박스권 가격 비교
             if (int(price_list[0]) <= 100000):
                 total = "박스권 최하단"
-        if (stock_list[i] == "제이엘케이"):
-            # 현재 시세와 박스권 가격 비교
-            if (int(price_list[0]) <= 10000):
-                total = "박스권 최하단 매수"
 
+
+        ## 각 종목들의 PER, PBR 알아내기
+        try:
+            url1 = "https://finance.naver.com/item/main.nhn?code="
+            url2 = stockCode_list[i]
+            url = url1 + url2    # 다음 금융의 '기업정보'탭
+            driver.get(url)
+
+            xpath = "//*[@id='_per']" # PER에 대한 xpath
+
+            PERValue = WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.XPATH, xpath))).text
+        except TimeoutException:
+            PERValue = "PER없음"
+        try:
+            xpath = "//*[@id='_pbr']" # PBR에 대한 xpath
+
+            PBRValue = WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.XPATH, xpath))).text
+        except TimeoutException:
+            PBRValue = "PBR없음"
 
         # 출력할 데이터 설정
         result_list = []
@@ -276,6 +295,8 @@ try:
         result_list.append(forign_buyingHistory_message)    # 외국인 연속수급
         result_list.append(company_buyingHistory_message)   # 기관 연속 수급
         result_list.append(total)
+        result_list.append(PERValue)
+        result_list.append(PBRValue)
         result_list.append(url)     # 현재 참조하고있는 페이지
 
         print(result_list)
@@ -284,6 +305,6 @@ try:
 
     driver.quit()
 
-except:
-    print("--에러 발생--")
+except TimeoutException:
+    print("--통신 에러 발생--")
     driver.quit()
