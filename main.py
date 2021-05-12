@@ -6,6 +6,7 @@ import time
 import get_sotckCode
 import check_Excell
 import numpy
+import controlExcel
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -222,6 +223,8 @@ try:
         # 0. 급등 0번 + 급락 0번 이상 + 외국인 3일 연속 구매 = 외국인 풀매수
         if forign_buyingHistory_unit == "+" and foreign_buyingHistory_value >= 3 and five_change_counter_plus == 0 and five_change_counter_minus >= 0:
             total = "0순위 외국인 풀매수"
+            # 해당 종목명을 '매수추천' 시트에 기록
+            controlExcel.add_stock(stock_list[i])
         # 1. 이평선 위 + CCI(40이하) + 최근 급등 1번 or 급락 있음(1 => ) + 외국인이 구매 시작 = 매수 고려
         elif present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus > 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "매수 고려1"
@@ -246,9 +249,13 @@ try:
         # 8 최근 변동 1번 이하 + 외국인 2일 연속 매수 + 기관 2일 연속매수 + 이동선위 = 매수고려
         elif (five_change_counter_plus <= 1 or five_change_counter_minus <= 1) and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1 and present_diff_avgFive > 0:
             total = "매수 고려8"
+            # 해당 종목명을 '매수추천' 시트에 기록
+            controlExcel.add_stock(stock_list[i])
         # 9 외국인 2일 연속 매수 + 기관 2일 연속 매수 = 외국인 기관 양매수
         elif forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1:
             total = "기관 외국인 이틀 양매수9"
+            # 해당 종목명을 '매수추천' 시트에 기록
+            controlExcel.add_stock(stock_list[i])
         # 10 6일동안 변동 +, - 한 개도 없음 = 차트보기
         elif five_change_counter_plus == 0 and five_change_counter_minus == 0:
             total = "6일간 큰변동 없음"
