@@ -32,13 +32,14 @@ def saveExcell(load_wb):
         print("열려있는 AI_List.xlsx 엑셀을 닫으세요")
 
 # 셀에 종목 기록하기
-def add_stock(stock):
-    for i in range(2, 100):
+def add_stock(stock, url):
+    for i in range(2, 200):
         # 'B2'부터 'B100'까지 읽기
         stock_name = load_sheet.cell(i, 2).value
-        # 셀 비었으면 기록하고 함수 종료
+        # 셀 비었으면 종목명, 해당 종목의 URL 기록하고 함수 종료
         if stock_name == None:
             load_sheet.cell(i, 2).value = stock
+            load_sheet.cell(i, 3).value = url
             break
         # 셀에 뭔가 적혀있으면 다음 셀로 이동
         else:
