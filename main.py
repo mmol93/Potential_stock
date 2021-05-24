@@ -1,8 +1,5 @@
 from selenium import webdriver
 from datetime import datetime
-import os
-import shutil
-import time
 import get_sotckCode
 import check_Excell
 import numpy
@@ -119,6 +116,7 @@ try:
         MAMP = sum(MAMP_list) / 10
         MD = numpy.std(MAMP_list)
 
+        # CCI에 대한 정보는 참고서 참조
         CCI = (MP - MAMP) // (0.015 * MD)
 
         # print(high_price_list)
@@ -184,8 +182,8 @@ try:
 
         # 기관 수급 확인
         # 위에서 사용한 변수 초기화
-        xpath_counter = 0;
-        xpath_num = 2;
+        xpath_counter = 0
+        xpath_num = 2
         company_buyingHistory_unit = ""
         company_buyingHistory_value = 0
         try:
@@ -211,7 +209,7 @@ try:
                     xpath_counter += 1
                 else:
                     company_buyingHistory_message = "(" + str(company_buyingHistory_unit) + str(xpath_counter) + "일간)"
-                    break;
+                    break
                 xpath_num += 1
             company_buyingHistory_message = "(" + str(company_buyingHistory_unit) + str(xpath_counter) + "일간)"
             company_buyingHistory_value = xpath_counter
@@ -225,27 +223,32 @@ try:
             total = "0순위 외국인 풀매수"
             # 해당 종목명을 '매수추천' 시트에 기록
             controlExcel.add_stock(stock_list[i], url)
-        # 1. 이평선 위 + CCI(40이하) + 최근 급등 1번 or 급락 있음(1 => ) + 외국인이 구매 시작 = 매수 고려
+        # 1. 5일 이평선 위 + CCI(40이하) + 최근 급등 1번 있음 + 외국인이 구매 시작 = 매수 고려
         elif present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus > 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "매수 고려1"
-        # 2. 이평선 아래 + CCI(40이하) + 급락 2번 이상 = 주시하기 or 뉴스 확인
+            controlExcel.add_stock(stock_list[i], url)
+        # 2. 5일 이평선 아래 + CCI(40이하) + 급락 2번 이상 = 주시하기 or 뉴스 확인
         elif present_diff_avgFive < 0 and five_change_counter_minus > 1:
             total = "뉴스 확인2"
-        # 3. 이평선 위 + CCI(80 이상) + 최근 급등 2번 + 외국인 매수 = 매수 고려
-        elif present_diff_avgFive > 0 and CCI >= 80 and five_change_counter_plus > 1 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
+        # 3. 5일 이평선 위 + CCI(80 이상) + 최근 급등 2번 + 외국인 매수 2번 이상= 매수 고려
+        elif present_diff_avgFive > 0 and CCI >= 80 and five_change_counter_plus > 1 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value >= 2:
             total = "올라 타기3"
-        # 4. 이평선 아래 + CCI(40이하) + 최근 급락 1번 + 외국인 매수 2번 = 매수 고려
+        # 4. 5일 이평선 아래 + CCI(40이하) + 최근 급락 1번 + 외국인 매수 2번 = 매수 고려
         elif present_diff_avgFive < 0 and CCI <= 40 and five_change_counter_minus >= 1 and foreign_buyingHistory_value > 1 and forign_buyingHistory_unit == "+":
             total = "매수 고려4"
+            controlExcel.add_stock(stock_list[i], url)
         # 5 CCI(40이하) + 외국인/기관 매수 = 매수 고려
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and MACD < 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "MACD 매수 고려5"
+            controlExcel.add_stock(stock_list[i], url)
         # 6 CCI(40이하) + 최근 급락/급등 없음 + 외국인 매수 = 눌림목
         elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
             total = "눌림목"
-        # 7 CCI(40이하) + 최근 5일간 급락/급등(+- 1.5%) 없음 + 외국인/기관 매수 1번 이상 = 매수고려
-        elif CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 0:
+            controlExcel.add_stock(stock_list[i], url)
+        # 7 5일 이평선 위 + CCI(40이하) + 최근 5일간 급락/급등(+- 1.5%) 없음 + 외국인/기관 매수 2번 이상 = 매수고려
+        elif present_diff_avgFive > 0 and CCI <= 40 and five_change_counter_plus == 0 and five_change_counter_minus == 0 and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1:
             total = "매수 고려7"
+            controlExcel.add_stock(stock_list[i], url)
         # 8 최근 변동 1번 이하 + 외국인 2일 연속 매수 + 기관 2일 연속매수 + 이동선위 = 매수고려
         elif (five_change_counter_plus <= 1 or five_change_counter_minus <= 1) and forign_buyingHistory_unit == "+" and foreign_buyingHistory_value > 1 and company_buyingHistory_unit == "+" and company_buyingHistory_value > 1 and present_diff_avgFive > 0:
             total = "매수 고려8"
@@ -259,16 +262,21 @@ try:
         # 10 6일동안 변동 +, - 한 개도 없음 = 차트보기
         elif five_change_counter_plus == 0 and five_change_counter_minus == 0:
             total = "6일간 큰변동 없음"
+        # 11 기관 매수 연속 3번 이상 + 급등 0번 + 급락 0번 = 기관 풀매수
+        elif company_buyingHistory_unit == "+" and company_buyingHistory_value >= 3 and five_change_counter_plus == 0 and five_change_counter_minus == 0 :
+            total = "0순위 기관 풀매수"
+            # 해당 종목명을 '매수추천' 시트에 기록
+            controlExcel.add_stock(stock_list[i], url)
         # 직접 분석
         else:
             total = "X"
 
         ### 박스권 설정
         # 종목명 설정
-        if (stock_list[i] == "더존비즈온"):
-            # 현재 시세와 박스권 가격 비교
-            if (int(price_list[0]) <= 100000):
-                total = "박스권 최하단"
+        # if (stock_list[i] == "더존비즈온"):
+        #     # 현재 시세와 박스권 가격 비교
+        #     if (int(price_list[0]) <= 100000):
+        #         total = "박스권 최하단"
 
 
         ## 각 종목들의 PER, PBR 알아내기
