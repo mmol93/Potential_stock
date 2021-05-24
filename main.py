@@ -31,6 +31,9 @@ print("len(stock_list): " + str(len(stock_list)))
 ## 각 종목들 사이트(네이버)에 접속하여 정보 가져오기
 i = 0
 try:
+    # 시작하기 전에 엑셀의 '추천 종목' 부분 기록되어 있는 데이터 삭제
+    controlExcel.delete_data()
+
     # 종목 1개씩 실시(test : 1로 설정하여 종목 1개에 대해서만 실시하게 하기), 나중에느 len(stock_list)로 변경하기
     while i < len(stock_list) / 2:  # 이유는 모르겠지만 엑셀에서 리스트 가져올 때 1번 복사해서 또 넣음;;
         driver = webdriver.Chrome("C:/selenium/chromedriver", options=options)

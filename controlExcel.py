@@ -46,3 +46,15 @@ def add_stock(stock, url):
             continue
 # 엑셀 저장
     saveExcell(load_wb)
+
+# 기록하기 전에 기존 데이터 삭제하기
+def delete_data():
+    cell1 = "B2"
+    cell2 = "C200"
+    for cell_range in load_sheet[cell1:cell2]:
+        for cell_clear in cell_range:
+            if cell_clear.value is None:
+                return
+            cell_clear.value = None
+    # 엑셀 저장
+    saveExcell(load_wb)
