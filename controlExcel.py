@@ -51,6 +51,6 @@ def add_stock(stock, url):
 def delete_data():
     # 2, 3번 열 삭제
     load_sheet.delete_cols(2)
-    load_sheet.delete_cols(3)
+    load_sheet.delete_cols(2)
     # 엑셀 저장
     saveExcell(load_wb)
