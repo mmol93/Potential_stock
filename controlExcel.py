@@ -1,3 +1,5 @@
+import datetime
+
 from openpyxl import load_workbook
 import getpass
 
@@ -47,10 +49,17 @@ def add_stock(stock, url):
 # 엑셀 저장
     saveExcell(load_wb)
 
-# 기록하기 전에 기존 데이터 삭제하기
+# 기록하기 전에 기존 데이터 삭제하고 시작 날짜 입력하기
 def delete_data():
+    today = datetime.datetime.now()
+    today = today.strftime("%Y-%m-%d")
+
     # 2, 3번 열 삭제
     load_sheet.delete_cols(2)
     load_sheet.delete_cols(2)
+
+    # 날짜 입력
+    load_sheet.cell(1, 2).value = str(today)
+
     # 엑셀 저장
     saveExcell(load_wb)
