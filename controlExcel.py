@@ -54,10 +54,10 @@ def delete_data():
     today = datetime.datetime.now()
     today = today.strftime("%Y-%m-%d")
 
-    # 1, 2, 3번 열 삭제
+    # 1, 2, 3번 열 삭제(삭제하면 하나씩 왼쪽으로 오기 때문에 이렇게 3번 삭제한다)
     load_sheet.delete_cols(1)
-    load_sheet.delete_cols(2)
-    load_sheet.delete_cols(3)
+    load_sheet.delete_cols(1)
+    load_sheet.delete_cols(1)
 
     # 날짜 입력
     load_sheet.cell(1, 2).value = str(today)
